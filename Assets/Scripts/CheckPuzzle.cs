@@ -35,9 +35,9 @@ public class CheckPuzzle : MonoBehaviour
             transform.SetPositionAndRotation(targetPuzzle.position, targetPuzzle.rotation);
             targetPuzzle.gameObject.SetActive(false);
 
-            rigidbody.constraints = RigidbodyConstraints.FreezaAll;
+            rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
-            boxCollider.enable = false;
+            boxCollider.enabled = false;
             audioSource.Play();
             isSolved = true;
         }

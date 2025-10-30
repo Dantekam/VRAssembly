@@ -1,45 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using OVR;
 using Oculus.Interaction;
-using Oculus.Interaction.Collections;
 
-public class CheckHouse: MonoBehaviour
+public class AssemblyPiece : MonoBehaviour
 {
-    public Transform targetCube;
-    public bool isSolved;
+    public Transform targetTransform;
+    public int stepIndex;
+    public Material highlightMaterial;
+    public Material defaultMaterial;
+
+    public static int currentStep = 0;
+    public static bool isDisassemblyMode = false;
 
     private AudioSource audioSource;
-    private Rigidbody rigidbody;
+    private Rigidbody rb;
     private BoxCollider boxCollider;
+    private MeshRenderer meshRenderer;
+    private bool isSolved = false;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
     void Update()
     {
-        float distance = Vector3.Distance(transform.position, targetCube.position);
+        float distance = Vector3.Distance(transform.position, targetTransform.position);
 
-        if (distance < 0.05f && !isSolved)
+        // Highlight current step
+        if ((stepIndex == currentStep && !isSolved && !isDisassemblyMode) ||
+            (stepIndex == currentStep - 1 && isSolved && isDisassemblyMode))
         {
-            IEnumerable<GrabInteractor> setInteractors = transform.GetChild(0).GetComponent<GrabInteractable>().Interactors;
-            foreach (GrabInteractor interactor in setInteractors)
-            {
-                interactor.Unselect();
-            }
-            transform.SetPositionAndRotation(targetCube.position, targetCube.rotation);
-            targetCube.gameObject.SetActive(false);
+            meshRenderer.material = highlightMaterial;
+        }
+        else
+        {
+            meshRenderer.material = defaultMaterial;
+        }
 
-            rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-
-            boxCollider.enabled = false;
+        // Assembly logic
+        if (distance < 0.05f && !isSolved && stepIndex == currentStep && !isDisassemblyMode)
+        {
+            ForceRelease();
+            SnapToTarget();
+            LockPiece();
             audioSource.Play();
             isSolved = true;
+            currentStep++;
         }
+
+        // Disassembly logic
+        if (distance < 0.05f && isSolved && stepIndex == currentStep - 1 && isDisassemblyMode)
+        {
+            UnlockPiece();
+            targetTransform.gameObject.SetActive(true);
+            isSolved = false;
+            currentStep--;
+        }
+    }
+
+    void ForceRelease()
+    {
+        GrabInteractable grab = transform.GetChild(0).GetComponent<GrabInteractable>();
+        foreach (GrabInteractor interactor in grab.Interactors)
+        {
+            interactor.Unselect();
+        }
+    }
+
+    void SnapToTarget()
+    {
+        transform.SetPositionAndRotation(targetTransform.position, targetTransform.rotation);
+        targetTransform.gameObject.SetActive(false);
+    }
+
+    void LockPiece()
+    {
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+        boxCollider.enabled = false;
+    }
+
+    void UnlockPiece()
+    {
+        rb.constraints = RigidbodyConstraints.None;
+        boxCollider.enabled = true;
     }
 }

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 60f5afd9f2b6ca24fba8c32ff3715df4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - buttonRenderer: {instanceID: 0}
+  - disassemblyOffMaterial: {fileID: 2100000, guid: 5d794527d6501f04482b9a33ac78d9ec, type: 2}
+  - disassemblyOnMaterial: {fileID: 2100000, guid: 02543a783a1450f4bb3302e6b134a4ae, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

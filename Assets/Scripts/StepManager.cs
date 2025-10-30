@@ -3,8 +3,12 @@ using TMPro;
 
 public class StepManager : MonoBehaviour
 {
-    public TextMeshProUGUI stepText;
+    public TextMeshProUGUI stepText; // Canvas-based TextMeshPro
     public string[] stepInstructions;
+
+    [Header("Next Phase Unlock")]
+    public GameObject pathwaySet; // Assign in Inspector
+    private bool pathwayUnlocked = false;
 
     void Update()
     {
@@ -16,7 +20,22 @@ public class StepManager : MonoBehaviour
         }
         else
         {
-            stepText.text = "Assembly complete!";
+            if (!pathwayUnlocked)
+            {
+                UnlockPathway();
+                pathwayUnlocked = true;
+            }
+
+            // Show final message on Canvas TextMeshPro
+            stepText.text = "House complete! This next set is all you.";
+        }
+    }
+
+    void UnlockPathway()
+    {
+        if (pathwaySet != null)
+        {
+            pathwaySet.SetActive(true);
         }
     }
 }
